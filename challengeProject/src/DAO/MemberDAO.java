@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 
 import org.apache.tomcat.dbcp.dbcp2.BasicDataSource;
 
+import DTO.MemberDTO;
+
 public class MemberDAO {
 	
 	private static MemberDAO instance;
@@ -43,5 +45,71 @@ public class MemberDAO {
 		
 	}
 	
-
+	public int insert(MemberDTO dto) throws Exception{
+		String sql = "insert into member values (?,?,?,?,?,?,?)";
+		try(Connection con = getConnection();
+				PreparedStatement psta = con.prepareStatement(sql);){
+			psta.setString(1, dto.getId());
+			psta.setString(2, dto.getPw());
+			psta.setString(3, dto.getName());
+			psta.setString(4, dto.getPhone());
+			psta.setString(5, dto.getEmail());
+			psta.setInt(6, dto.getPoint());
+			psta.setString(7, dto.getGetout());
+			
+			int result = psta.executeUpdate();
+			con.commit();
+			return result;
+			
+		}
+		
+	}
+	
+	public int delete(String id) throws Exception{
+		String sql = "delete from member where id = ?";
+		try(Connection con = getConnection();
+				PreparedStatement psta = con.prepareStatement(sql);){
+			psta.setString(1, id);
+			
+			int result = psta.executeUpdate();
+			con.commit();
+			return result;
+		}
+	}
+	
+	public MemberDTO select(String id) throws Exception{
+		String sql = "select * from member where id=?";
+				try(Connection con = getConnection();
+						PreparedStatement psta = con.prepareStatement(sql);){
+					MemberDTO mypage = null;
+					
+					psta.setString(1, id);
+					
+					try(ResultSet rs = psta.executeQuery();){
+						if(rs.next()) {
+							String id2 = rs.getString(1);
+							String pw = rs.getString(2);
+							String name = rs.getString(3);
+							String phone = rs.getString(4);
+							String email = rs.getString(5);
+							int point = rs.getInt(6);
+							String getout = rs.getString(7);
+							
+							mypage = new MemberDTO(id2, pw, name, phone, email, point, getout);
+							con.commit();
+						}
+					}
+					return mypage;
+					
+				}
+	}
+	
+//	public int update(String id) throws Exception{
+//		String sql = "";
+//	}
+//	
+	
+	
+	
+	
 }
